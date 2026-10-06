@@ -19,16 +19,61 @@ Any papers using this code should cite the paper accordingly.
 
 As is, the code produces the results given as the first experimental setting with dataset which is provided in ('Non-parametric blur map regression for depth of field extension'). In order to reach the dataset, you should contact with the author of this paper. The code here includes just 1 sample images from this dataset.
 
+### Installation
+
+The project is managed with [uv](https://docs.astral.sh/uv/) and implemented in PyTorch.
+
+```sh
+$ uv sync
+```
+
 ### Running
 
 ```sh
-$ python3 BENet.py -i images/image_01.png
+$ uv run benet -i images/image_01.png
 ```
 
-In order to make a fair comparisons, we use the same edge maps in some other edge based defocus blur estimations. If you want to use the precomputed edges, which are provided in "recomputed_edges/"
+This writes `image_01_bmap.png` (blur map, scaled so that sigma = 6 maps to 255) and `image_01_edge.png`
+(all edge pixels in blue, depth edges additionally in red) next to the input image. Use `-o DIR` to write elsewhere,
+and `--device cuda` to run the networks on a GPU.
+
+In order to make a fair comparisons, we use the same edge maps in some other edge based defocus blur estimations. If you want to use the precomputed edges, which are provided in "precomputed_edges/"
 
 ```sh
-$ python3 BENet.py -i images/image_01.png -e precomputed_edges/edge_01.png 
+$ uv run benet -i images/image_01.png -e precomputed_edges/edge_01.png
+```
+
+### Python API
+
+```python
+import numpy as np
+from PIL import Image
+from benet import estimate_blur_map, load_networks
+
+bnet, enet = load_networks()  # or load_networks(device="cuda")
+img = np.asarray(Image.open("images/image_01.png").convert("RGB"))
+result = estimate_blur_map(img, bnet, enet)
+result.blur_map  # (H, W) float array, Gaussian sigma in pixels
+```
+
+### Pretrained weights
+
+The pretrained networks are stored as PyTorch state dicts in `src/benet/weights/` (`bnet.pth`, `enet.pth`)
+and can be loaded with plain PyTorch:
+
+```python
+import torch
+from benet import BNet
+
+state_dict = torch.load("src/benet/weights/bnet.pth", weights_only=True)
+bnet = BNet()
+bnet.load_state_dict(state_dict)
+```
+
+They were converted from the original TensorFlow 1.x exports in `models_tf1x/`:
+
+```sh
+$ uv run --group convert scripts/convert_tf_weights.py
 ```
 
 Please also report any bug to alixkaraali[at_sign]gmail[dot_sign]com

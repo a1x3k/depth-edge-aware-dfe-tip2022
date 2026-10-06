@@ -1,0 +1,30 @@
+[project]
+name = "depth-edge-aware-benet"
+version = "0.2.0"
+description = "Depth edge aware defocus blur estimation (TIP 2022), PyTorch implementation."
+readme = "README.md"
+license = "GPL-3.0-or-later"
+requires-python = ">=3.10"
+dependencies = [
+    # PyTorch stopped publishing Intel macOS wheels after 2.2.2, which is built against NumPy 1.x.
+    "torch>=2.2.2; sys_platform != 'darwin' or platform_machine != 'x86_64'",
+    "torch==2.2.2; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+    "numpy>=1.24",
+    "numpy<2; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+    "pillow>=10.0",
+    "scikit-image>=0.22",
+]
+
+[project.scripts]
+benet = "benet.cli:main"
+
+[dependency-groups]
+# Only needed to regenerate the PyTorch weights from the original .mat exports.
+convert = ["scipy>=1.11"]
+
+[build-system]
+requires = ["uv_build>=0.8,<0.12"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "benet"
