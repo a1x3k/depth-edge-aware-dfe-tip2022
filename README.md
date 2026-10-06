@@ -76,9 +76,6 @@ They were converted from the original TensorFlow 1.x exports in `models_tf1x/`:
 $ uv run --group convert scripts/convert_tf_weights.py
 ```
 
-Please also report any bug to alixkaraali[at_sign]gmail[dot_sign]com
-
-
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
 
